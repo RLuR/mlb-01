@@ -24,3 +24,13 @@ def monte_carlo_split(X: pd.DataFrame, Y: pd.DataFrame, test_ratio = 0.2) -> (pd
     test_size =  round(len(X) * test_ratio)
     random_indexes = rng.choice(len(X) - 1, size= test_size, replace=False)
     return X.drop(random_indexes),  Y.drop(random_indexes), X.iloc[random_indexes], Y.iloc[random_indexes]
+
+def get_accuracy(true_results, predicted_results) -> float:
+    matching_results = 0
+    for index, value in enumerate(true_results):
+        if value == predicted_results[index]:
+            matching_results += 1
+
+    return matching_results/len(true_results)
+
+
