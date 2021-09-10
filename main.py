@@ -22,22 +22,29 @@ def test_classifier():
     # normalize features
     X = utils.normalize_features(X)
 
-    my_accuracies = pd.Series()
-    sk_learn_accuracies = pd.Series()
+    my_results = []
+    sklearn_results = []
+
     splits = 10
 
+    # hyper parameter training
     for k in range(1,15):
-        my_accuracies._set_value(k, train_and_evaluate_knn(X, Y, k, splits, models.knn.classify))
-        sk_learn_accuracies._set_value(k, train_and_evaluate_knn(X, Y, k, splits, train_and_predict_sklearn))
+        my_acc, my_std_dev = train_and_evaluate_knn(X, Y, k, splits, models.knn.classify)
+        my_results.append([k, my_acc, my_std_dev])
+        sklearn_acc, sklearn_std_dev = train_and_evaluate_knn(X, Y, k, splits, models.knn.classify)
+        sklearn_results.append([k, sklearn_acc, sklearn_std_dev])
 
-    print(f"My accuracies: \n{my_accuracies}")
-    print(f"SKlearn accuracies: \n{sk_learn_accuracies}")
-    print(f"My best accuracy: {my_accuracies.max()}, with k = {my_accuracies.idxmax() }")
-    print(f"sklearn accuracy: {sk_learn_accuracies.max()}, with k = {sk_learn_accuracies.idxmax()}")
+    my_results = pd.DataFrame(data=my_results, columns=["k", "accuracy", "std_dev"],)
+    sklearn_results = pd.DataFrame(data=sklearn_results, columns=["k", "accuracy", "std_dev"])
 
+
+    print(f"My results: \n{my_results}")
+    print(f"SKlearn results: \n{sklearn_results}")
+    print(f"My highest accuracy: \n{my_results.loc[my_results['accuracy'].idxmax()]}")
+    print(f"Sklearn highest accuracy: \n{sklearn_results.loc[sklearn_results['accuracy'].idxmax()]}")
 
 def train_and_evaluate_knn(X, Y, k, splits, classifier_method):
-    accuracies = []
+    results = []
     for i in range(splits):
         X_train, Y_train, X_test, Y_test = utils.monte_carlo_split(X, Y)
         # train and test model
@@ -45,10 +52,9 @@ def train_and_evaluate_knn(X, Y, k, splits, classifier_method):
 
         Y_test = Y_test.to_numpy()
         # evaluate
-        accuracies.append(utils.get_accuracy(Y_predict, Y_test))
-    accuracies = pd.Series(accuracies)
-    overall_acc = accuracies.mean()
-    return overall_acc
+        results.append(utils.get_accuracy(Y_predict, Y_test))
+    results = pd.Series(results)
+    return results.mean(), results.std()
 
 
 def train_and_predict_sklearn(X_train, Y_train, X_test, k):

@@ -7,8 +7,8 @@ def classify(x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, k:
 
 
 def classify_row(x_train: pd.DataFrame, y_train: pd.Series, test_row: pd.Series, k: int) -> int:
-    closest_elements = get_k_closest_training_data(x_train, test_row, k)
-    return get_most_common_value(y_train.iloc[closest_elements])
+    closest_elements_idx = get_k_closest_training_data(x_train, test_row, k)
+    return get_most_common_value(y_train.iloc[closest_elements_idx])
 
 
 def regress(x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, k: int) -> np.array:
@@ -28,8 +28,10 @@ def get_k_closest_training_data(x_train: pd.DataFrame, x_test: pd.Series, k) -> 
 
 def distance_function(vector_1: pd.Series, vector_2: pd.Series) -> float:
     # Some numpy magic to get the euclidean distance
-    return np.linalg.norm(vector_1 - vector_2)
+    # euclidean distance is defined as the L2 norm of the vectors
+    return np.linalg.norm(vector_1 - vector_2, ord=2)
 
 
 def get_most_common_value(y_train):
+    # Uniform weight
     return y_train.mode()[0]
