@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+
 #Fixed rng seed for reproducability
 rng = np.random.default_rng(1000)
 
@@ -37,3 +39,29 @@ def get_accuracy(true_results, predicted_results) -> float:
 def get_mean_square_error(true_results, predicted_results) -> float:
     return np.square(np.subtract(true_results,predicted_results)).mean()
 
+
+def train_and_evaluate_knn(X, Y, k, splits, classifier_method, evaluation_function):
+    results = []
+    for i in range(splits):
+        X_train, Y_train, X_test, Y_test = monte_carlo_split(X, Y)
+        # train and test model
+        Y_predict = classifier_method(X_train, Y_train, X_test, k)
+
+        Y_test = Y_test.to_numpy()
+        # evaluate
+        results.append(evaluation_function(Y_predict, Y_test))
+    results = pd.Series(results)
+    return results.mean(), results.std()
+
+
+def train_and_classify_sklearn(X_train, Y_train, X_test, k):
+    knn_model = KNeighborsClassifier(n_neighbors=k,
+                                     metric="euclidean",
+                                     weights="uniform")
+    knn_model = knn_model.fit(X_train, Y_train)
+    return knn_model.predict(X_test)
+
+def train_and_regress_sklearn(X_train, Y_train, X_test, k):
+    knn_model = KNeighborsRegressor(n_neighbors=k)
+    knn_model = knn_model.fit(X_train, Y_train)
+    return knn_model.predict(X_test)
