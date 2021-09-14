@@ -45,6 +45,9 @@ def test_classifier():
     print(f"My highest accuracy: \n{my_results.loc[my_results['accuracy'].idxmax()]}")
     print(f"Sklearn highest accuracy: \n{sklearn_results.loc[sklearn_results['accuracy'].idxmax()]}")
 
+    my_results.to_csv("results/my_classification_results.csv")
+    sklearn_results.to_csv("results/sklearn_classification_results.csv")
+
 
 def test_regressor():
     data = load_boston()
@@ -72,6 +75,11 @@ def test_regressor():
     print(f"SKlearn results: \n{sklearn_results}")
     print(f"My best mse: \n{my_results.loc[my_results['mse'].idxmin()]}")
     print(f"Sklearn best mse: \n{sklearn_results.loc[sklearn_results['mse'].idxmin()]}")
+
+    # save results
+
+    my_results.to_csv("results/my_regression_results.csv")
+    sklearn_results.to_csv("results/sklearn_regression_results.csv")
 
 
 # Press the green button in the gutter to run the script.
